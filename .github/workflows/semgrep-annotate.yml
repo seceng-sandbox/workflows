@@ -1,0 +1,46 @@
+name: Semgrep Annotations
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: "Name of the uploaded artifact containing the Semgrep JSON output"
+        required: true
+        type: string
+
+jobs:
+  annotate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Download semgrep JSON
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+
+      - name: Emit annotations
+        run: |
+          ruby -r json -e '
+            def level_for(severity)
+              case severity
+              when "ERROR" then "error"
+              when "WARNING" then "warning"
+              else "notice"
+              end
+            end
+
+            data = JSON.parse(File.read("semgrep-output.json"))
+            data["results"].each do |res|
+              path = res["path"]
+              line = res["start"]["line"]
+              level = level_for(res["extra"]["severity"])
+              msg = res["extra"]["message"]
+              puts "::#{level} file=#{path},line=#{line}::#{msg}"
+            end
+          '
+
