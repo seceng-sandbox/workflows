@@ -1,6 +1,7 @@
 on: 
   schedule:
     - cron: "22 12 * * 1" # At 12:22 on Monday UTC time (8:22 AM EST)
+  workflow_dispatch:
 
 jobs:
   nmap-scanner:
