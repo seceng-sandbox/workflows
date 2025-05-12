@@ -5,7 +5,7 @@
 # Nmap is used for running the scan
 # xsltproc is used to convert the XML output file into HTML
 # wkhtmltopdf is used to convert the HTML file into a PDF
-sudo apt -qq install nmap xsltproc wkhtmltopdf
+sudo apt update && sudo apt -qq install nmap xsltproc wkhtmltopdf
 
 # Scans targets under /assets/scan-targets.txt in the repo
 # Fast scan:
