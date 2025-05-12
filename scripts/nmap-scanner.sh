@@ -1,5 +1,6 @@
 #!/bin/bash
 # Nmap scanning script
+# NOTE: Remember to chmod +x this script
 
 # Install packages:
 # Nmap is used for running the scan
