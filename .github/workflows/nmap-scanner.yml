@@ -1,6 +1,8 @@
+name: Nmap - Vulnerability Scan
+
 on: 
   schedule:
-    - cron: "22 12 * * 1" # At 12:22 on Monday UTC time (8:22 AM EST)
+    - cron: "22 17 * * 2" # At 17:22 on Monday UTC time (1:22 PM EST)
   workflow_dispatch:
 
 jobs:
