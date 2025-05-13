@@ -7,6 +7,11 @@ on:
         description: "Name of the uploaded artifact containing the Semgrep JSON output"
         required: true
         type: string
+      fail_on_findings:
+        description: "If true, fail the job on ERROR or WARNING findings"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   annotate:
@@ -24,6 +29,7 @@ jobs:
           name: ${{ inputs.artifact_name }}
 
       - name: Emit annotations
+        id: annotate
         run: |
           ruby -r json -e '
             def level_for(severity)
@@ -35,12 +41,24 @@ jobs:
             end
 
             data = JSON.parse(File.read("semgrep-output.json"))
+            findings = 0
+
             data["results"].each do |res|
               path = res["path"]
               line = res["start"]["line"]
               level = level_for(res["extra"]["severity"])
               msg = res["extra"]["message"]
               puts "::#{level} file=#{path},line=#{line}::#{msg}"
+              findings += 1 if ["error", "warning"].include?(level)
             end
+
+            # Emit GitHub Actions output
+            puts "findings=#{findings > 0}"  # for debugging
+            File.open(ENV["GITHUB_OUTPUT"], "a") { |f| f.puts("has_findings=#{findings > 0}") }
           '
 
+      - name: Fail if findings exist and fail_on_findings is true
+        if: ${{ inputs.fail_on_findings == true && steps.annotate.outputs.has_findings == 'true' }}
+        run: |
+          echo "::error::Failing due to error or warning findings"
+          exit 1
