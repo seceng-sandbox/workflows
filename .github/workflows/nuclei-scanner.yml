@@ -1,8 +1,8 @@
 name: Nuclei - Vulnerability Scan
 
 on:
-    schedule:
-      - cron: "13 12 * * 1" # At 12:13 on Monday UTC time (8:13 AM EST)
+    #schedule:
+    #  - cron: "13 12 * * 1" # At 12:13 on Monday UTC time (8:13 AM EST)
     workflow_dispatch:
 
 jobs:
